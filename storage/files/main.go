@@ -74,7 +74,7 @@ func (s Strg) generateFilename(expiration time.Time) string {
 
 // New constructor for Strg
 func New(l kitlog.Logger, path string) (*Strg, error) {
-	logger := kitlog.With(l, "Service", "DB")
+	logger := kitlog.With(l, "service", "DB")
 
 	if path == "" {
 		l.Log("message", "Could not init service", "error", "empty path")

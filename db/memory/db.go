@@ -19,7 +19,7 @@ type Repo struct {
 // New is constructor for Repo
 // set the path
 func New(l kitlog.Logger) (*Repo, error) {
-	logger := kitlog.With(l, "Service", "In memeory DB")
+	logger := kitlog.With(l, "service", "In memeory DB")
 
 	return &Repo{logger: logger, db: make(map[string]db.Model)}, nil
 }

@@ -1,3 +1,4 @@
 uploads/
 dbFiles/
 redis-data/
+redis.conf/

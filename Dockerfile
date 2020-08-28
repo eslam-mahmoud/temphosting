@@ -11,6 +11,8 @@ ENV GO111MODULE=on
 # go get -u -t ./... is similar, but also upgrades test dependencies
 RUN go get -u -t ./...
 
+RUN rm -f ./webserver
+
 # should build and run executable
 RUN go build ./cmd/webserver/
 
