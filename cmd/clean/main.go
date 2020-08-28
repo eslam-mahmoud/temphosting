@@ -15,6 +15,7 @@ import (
 	kitlog "github.com/go-kit/kit/log"
 )
 
+// $ go run ./cmd/clean/*.go -dbPath="./dbFiles" -storagePath="./uploads"
 func main() {
 	// read command line flags
 	// return pointer
