@@ -18,7 +18,7 @@ import (
 )
 
 // $ go run ./cmd/clean/*.go -dbType=files -dbPath="./dbFiles" -storagePath="./uploads"
-// $ go run ./cmd/clean/*.go -dbType=redis -dbHost="redis:6379" -storagePath="./uploads"
+// $ go run ./cmd/clean/*.go -dbType="redis" -redisHost="redis:6379" -storagePath="/go/src/app/uploads/"
 func main() {
 	// read command line flags
 	// return pointer
