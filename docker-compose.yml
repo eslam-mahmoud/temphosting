@@ -1,0 +1,32 @@
+version: '3'
+
+# Define services
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080" # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: unless-stopped
+    depends_on: 
+      - redis # This service depends on redis. Start that first.
+    environment: # Pass environment variables to the service
+      REDIS_URL: redis:6379
+    volumes:
+      - ./uploads:/go/src/app/uploads
+    networks: # Networks to join (Services on the same network can communicate with each other using their name)
+      - backend
+
+  # Redis Service   
+  redis:
+    image: "redis:alpine" # Use a public Redis image to build the redis service    
+    restart: unless-stopped
+    volumes:
+      - $PWD/redis-data:/var/lib/redis
+      - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - backend
+
+networks:
+  backend:

@@ -1,2 +1,3 @@
-./uploads/
-./dbFiles/
+uploads/
+dbFiles/
+redis-data/
