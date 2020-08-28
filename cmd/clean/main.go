@@ -10,18 +10,27 @@ import (
 	"strings"
 	"time"
 
-	db "github.com/eslam-mahmoud/tempstuff/db/files"
+	db "github.com/eslam-mahmoud/tempstuff/db"
+	filesDB "github.com/eslam-mahmoud/tempstuff/db/files"
+	redisDB "github.com/eslam-mahmoud/tempstuff/db/redis"
 	storage "github.com/eslam-mahmoud/tempstuff/storage/files"
 	kitlog "github.com/go-kit/kit/log"
 )
 
-// $ go run ./cmd/clean/*.go -dbPath="./dbFiles" -storagePath="./uploads"
+// $ go run ./cmd/clean/*.go -dbType=files -dbPath="./dbFiles" -storagePath="./uploads"
+// $ go run ./cmd/clean/*.go -dbType=redis -dbHost="redis:6379" -storagePath="./uploads"
 func main() {
 	// read command line flags
 	// return pointer
+	var dbType string
 	var dbPath string
+	var redisHost string
 	var storagePath string
-	flag.StringVar(&dbPath, "dbPath", "", "DB path")
+	var dbService db.Database
+
+	flag.StringVar(&dbType, "dbType", "", "DB Type (redis, files)")
+	flag.StringVar(&dbPath, "dbPath", "", "DB path for files DB")
+	flag.StringVar(&redisHost, "redisHost", "", "DB host url for redis DB")
 	flag.StringVar(&storagePath, "storagePath", "", "Storage path")
 	// parses from os.Args[1:]. Must be called after all flags are defined and before flags are accessed by the program.
 	flag.Parse()
@@ -32,8 +41,20 @@ func main() {
 		logger.Log("message", "could not init storage service", "error", err)
 		return
 	}
-	dbService, err := db.New(logger, dbPath)
-	if err != nil {
+	if dbType == "files" {
+		dbService, err = filesDB.New(logger, dbPath)
+		if err != nil {
+			logger.Log("message", "could not init files DB service", "error", err)
+			return
+		}
+		logger.Log("message", "Init files DB service", "error", err)
+	} else if dbType == "redis" {
+		dbService, err = redisDB.New(logger, redisHost)
+		if err != nil {
+			logger.Log("message", "could not init redis DB service", "error", err)
+		}
+		logger.Log("message", "Init redis DB service", "error", err)
+	} else {
 		logger.Log("message", "could not init DB service", "error", err)
 		return
 	}
@@ -42,7 +63,7 @@ func main() {
 
 	for {
 		// get list of the files
-		files, err := ioutil.ReadDir(dbPath)
+		files, err := ioutil.ReadDir(storagePath)
 		if err != nil {
 			logger.Log(
 				"message", "could not open dir",
@@ -52,7 +73,7 @@ func main() {
 		}
 
 		for _, f := range files {
-			id := strings.Trim(f.Name(), ".json")
+			id := f.Name()
 			// get expiration date from file name
 			splitedID := strings.Split(id, "-")
 			if len(splitedID) != 2 {
@@ -92,7 +113,7 @@ func main() {
 			StorageErr := storageService.Delete(context.Background(), id)
 			if StorageErr != nil {
 				logger.Log(
-					"message", "failed deleting expired file from DB",
+					"message", "failed deleting expired file from storage",
 					"error", StorageErr,
 					"id", id,
 				)
@@ -100,7 +121,7 @@ func main() {
 			dbErr := dbService.Delete(context.Background(), id)
 			if dbErr != nil {
 				logger.Log(
-					"message", "failed deleting expired file from storage",
+					"message", "failed deleting expired file from DB",
 					"error", dbErr,
 					"id", id,
 				)

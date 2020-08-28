@@ -13,7 +13,7 @@ import (
 )
 
 // RedisHost env var name
-const RedisHost = "REDIS_URL"
+const RedisHost = "REDIS_HOST"
 
 func main() {
 	// HACK TO KEEP THE IMPORT STATEMENT

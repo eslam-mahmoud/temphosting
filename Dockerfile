@@ -15,9 +15,9 @@ RUN rm -f ./webserver
 
 # should build and run executable
 RUN go build ./cmd/webserver/
-RUN go build ./cmd/clean/
+# RUN go build ./cmd/clean/
 
 EXPOSE 8080
 
-run ./clean
+# RUN ./clean
 CMD ["./webserver"]

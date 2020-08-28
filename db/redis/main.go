@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/eslam-mahmoud/tempstuff/db"
@@ -61,13 +63,35 @@ func (r *Repo) Get(ctx context.Context, id string) (file db.Model, err error) {
 
 // Delete remove entry from DB
 func (r *Repo) Delete(ctx context.Context, id string) error {
-	file, err := r.Get(ctx, id)
+	splitedID := strings.Split(id, "-")
+	if len(splitedID) != 2 {
+		r.logger.Log(
+			"message", "invalid id",
+			"id", id,
+		)
+		return errors.New("invalid id")
+	}
+	unixNano, err := strconv.ParseInt(splitedID[0], 10, 64)
 	if err != nil {
+		r.logger.Log(
+			"message", "failed ParseInt id",
+			"error", err,
+			"id", id,
+		)
 		return err
 	}
-	if time.Now().Before(file.Expiration) {
+
+	// validate expiration
+	// if expired delete and ignore errors
+	if time.Now().Before(time.Unix(0, unixNano)) {
 		return errors.New("file did not expire yet")
 	}
 	_, err = r.client.Del(ctx, id).Result()
 	return err
+}
+
+// Page return list of ids
+func (r *Repo) Page(ctx context.Context, page uint64, count int64) (nextPage uint64, ids []string, err error) {
+	ids, nextPage, err = r.client.Scan(ctx, page, "", count).Result()
+	return
 }

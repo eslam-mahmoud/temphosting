@@ -12,7 +12,8 @@ services:
     depends_on: 
       - redis # This service depends on redis. Start that first.
     environment: # Pass environment variables to the service
-      REDIS_URL: redis:6379
+      REDIS_HOST: redis:6379
+      # GIN_MODE: release
     volumes:
       - ./uploads:/go/src/app/uploads
     networks: # Networks to join (Services on the same network can communicate with each other using their name)

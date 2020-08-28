@@ -21,6 +21,7 @@ type Repo struct {
 func New(l kitlog.Logger) (*Repo, error) {
 	logger := kitlog.With(l, "service", "In memeory DB")
 
+	logger.Log("message", "init memory DB")
 	return &Repo{logger: logger, db: make(map[string]db.Model)}, nil
 }
 

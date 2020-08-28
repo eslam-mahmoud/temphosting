@@ -23,7 +23,7 @@ type Repo struct {
 // New is constructor for Repo
 // set the path
 func New(l kitlog.Logger, path string) (*Repo, error) {
-	logger := kitlog.With(l, "service", "DB")
+	logger := kitlog.With(l, "service", "Files DB")
 
 	if path == "" {
 		l.Log("message", "Could not init service", "error", "empty path")
@@ -34,6 +34,7 @@ func New(l kitlog.Logger, path string) (*Repo, error) {
 		l.Log("message", "Could not init service and MkdirAll", "error", err)
 		return nil, err
 	}
+	logger.Log("message", "init files DB")
 	return &Repo{logger: logger, path: path}, nil
 }
 

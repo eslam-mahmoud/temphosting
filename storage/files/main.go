@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	kitlog "github.com/go-kit/kit/log"
@@ -34,9 +35,29 @@ type File struct {
 }
 
 // Delete store file
-func (s Strg) Delete(ctx context.Context, ID string) error {
-	// TODO implement
-	return nil
+func (s Strg) Delete(ctx context.Context, id string) error {
+	splitedID := strings.Split(id, "-")
+	if len(splitedID) != 2 {
+		s.logger.Log(
+			"message", "invalid id",
+			"id", id,
+		)
+		return errors.New("invalid id")
+	}
+	unixNano, err := strconv.ParseInt(splitedID[0], 10, 64)
+	if err != nil {
+		s.logger.Log(
+			"message", "failed ParseInt id",
+			"error", err,
+			"id", id,
+		)
+		return err
+	}
+	if time.Now().Before(time.Unix(0, unixNano)) {
+		return errors.New("file did not expire yet")
+	}
+
+	return os.Remove(filepath.Join(s.FilesDst, id))
 }
 
 // Save store file
@@ -74,7 +95,7 @@ func (s Strg) generateFilename(expiration time.Time) string {
 
 // New constructor for Strg
 func New(l kitlog.Logger, path string) (*Strg, error) {
-	logger := kitlog.With(l, "service", "DB")
+	logger := kitlog.With(l, "service", "Storage")
 
 	if path == "" {
 		l.Log("message", "Could not init service", "error", "empty path")
