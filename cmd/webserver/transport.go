@@ -51,7 +51,7 @@ func upload(c *gin.Context) {
 
 	// max file size 10 MB
 	if file.Size > 10*1024*1024 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Max file size is 10MB, %v given", file.Size)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Max file size is 10MB, %vB given", file.Size)})
 		return
 	}
 
