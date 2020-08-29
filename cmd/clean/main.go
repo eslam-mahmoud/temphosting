@@ -19,6 +19,9 @@ import (
 
 // $ go run ./cmd/clean/*.go -dbType=files -dbPath="./dbFiles" -storagePath="./uploads"
 // $ go run ./cmd/clean/*.go -dbType="redis" -redisHost="redis:6379" -storagePath="/go/src/app/uploads/"
+const redisHostEnvVar = "REDIS_HOST"
+const storagePathEnvVar = "STORAGE_PATH"
+
 func main() {
 	// read command line flags
 	// return pointer
@@ -30,8 +33,8 @@ func main() {
 
 	flag.StringVar(&dbType, "dbType", "", "DB Type (redis, files)")
 	flag.StringVar(&dbPath, "dbPath", "", "DB path for files DB")
-	flag.StringVar(&redisHost, "redisHost", "", "DB host url for redis DB")
-	flag.StringVar(&storagePath, "storagePath", "", "Storage path")
+	flag.StringVar(&redisHost, "redisHost", os.Getenv(redisHostEnvVar), "DB host url for redis DB")
+	flag.StringVar(&storagePath, "storagePath", os.Getenv(storagePathEnvVar), "Storage path")
 	// parses from os.Args[1:]. Must be called after all flags are defined and before flags are accessed by the program.
 	flag.Parse()
 
@@ -53,7 +56,7 @@ func main() {
 		if err != nil {
 			logger.Log("message", "could not init redis DB service", "error", err)
 		}
-		logger.Log("message", "Init redis DB service", "error", err)
+		logger.Log("message", "Init redis DB service")
 	} else {
 		logger.Log("message", "could not init DB service", "error", err)
 		return

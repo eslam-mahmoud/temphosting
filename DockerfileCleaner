@@ -11,12 +11,10 @@ ENV GO111MODULE=on
 # go get -u -t ./... is similar, but also upgrades test dependencies
 RUN go get -u -t ./...
 
-RUN rm -f ./webserver
+RUN rm -f ./clean
 
 # should build and run executable
-RUN go build ./cmd/webserver/
+RUN go build ./cmd/clean/
 
-EXPOSE 8080
-
-# RUN ./clean
-CMD ["./webserver"]
+# RUN ./clean -dbType="redis" -redisHost="redis:6379" -storagePath="/go/src/app/uploads/"
+CMD ["./clean", "-dbType=redis"]
