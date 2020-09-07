@@ -59,22 +59,6 @@ func (s Srvs) Get(ctx context.Context, id string) (Item, error) {
 	// validate expiration
 	// if expired delete and ignore errors
 	if time.Now().After(time.Unix(0, unixNano)) {
-		// err := s.db.Delete(ctx, id)
-		// if err != nil {
-		// 	s.logger.Log(
-		// 		"message", "failed deleting expired file from DB",
-		// 		"error", err,
-		// 		"id", id,
-		// 	)
-		// }
-		// err = s.storage.Delete(ctx, id)
-		// if err != nil {
-		// 	s.logger.Log(
-		// 		"message", "failed deleting expired file from storage",
-		// 		"error", err,
-		// 		"id", id,
-		// 	)
-		// }
 		return Item{}, errors.New("File expired")
 	}
 
