@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
+	"path/filepath"
 	"time"
 
 	itemService "github.com/eslam-mahmoud/tempstuff"
@@ -26,6 +28,15 @@ func getItem(c *gin.Context) {
 
 func pong(c *gin.Context) {
 	c.String(http.StatusOK, "pong")
+}
+
+func home(c *gin.Context) {
+	path, err := os.Getwd()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.File(filepath.Join(path, "cmd/webserver/view/index.html"))
 }
 
 func upload(c *gin.Context) {

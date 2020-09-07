@@ -26,19 +26,17 @@ func main() {
 	storageService, err := storage.New(loggerService, "./uploads")
 	if err != nil {
 		loggerService.Log("message", "could not init storage service", "error", err)
+		return
 	}
-	// dbService, err := db.New(loggerService, "./dbFiles")
-	// if err != nil {
-	// 	loggerService.Log("message", "could not init DB service", "error", err)
-	// }
 	dbService, err := dbRedis.New(loggerService, os.Getenv(RedisHost))
 	if err != nil {
 		loggerService.Log("message", "could not init redis DB service", "error", err)
+		return
 	}
 	s := itemService.New(loggerService, storageService, dbService)
 
 	// Disable Console Color
-	// gin.DisableConsoleColor()
+	gin.DisableConsoleColor()
 	r := gin.Default()
 	// // LoggerWithFormatter middleware will write the logs to gin.DefaultWriter
 	// // By default gin.DefaultWriter = os.Stdout
@@ -64,6 +62,7 @@ func main() {
 	r.Use(setItemService(s))
 
 	// setup routs
+	r.GET("/", home)
 	r.GET("/ping", pong)
 	r.GET("/i/:id", getItem)
 	r.POST("/upload", upload)

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Temo hosting service">
+    <meta name="author" content="Eslam Mahmoud">
+    <title>Temp hosting</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">    <!-- Custom styles for this template -->
+    <style>
+      .bd-placeholder-img{font-size:1.125rem;text-anchor:middle;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}@media (min-width: 768px){.bd-placeholder-img-lg{font-size:3.5rem}}
+      a,a:focus,a:hover{color:#fff}.btn-secondary,.btn-secondary:focus,.btn-secondary:hover{color:#333;text-shadow:none;background-color:#fff;border:0.05rem solid #fff}body,html{height:100%;background-color:#333}body{display:-ms-flexbox;display:flex;color:#fff;text-shadow:0 0.05rem 0.1rem rgba(0, 0, 0, .5);box-shadow:inset 0 0 5rem rgba(0, 0, 0, .5)}.cover-container{max-width:42em}.masthead{margin-bottom:2rem}.masthead-brand{margin-bottom:0}.nav-masthead .nav-link{padding:0.25rem 0;font-weight:700;color:rgba(255, 255, 255, .5);background-color:transparent;border-bottom:0.25rem solid transparent}.nav-masthead .nav-link:focus,.nav-masthead .nav-link:hover{border-bottom-color:rgba(255, 255, 255, .25)}.nav-masthead .nav-link + .nav-link{margin-left:1rem}.nav-masthead .active{color:#fff;border-bottom-color:#fff}@media (min-width: 48em){.masthead-brand{float:left}.nav-masthead{float:right}}.cover{padding:0 1.5rem}.cover .btn-lg{padding:0.75rem 1.25rem;font-weight:700}.mastfoot{color:rgba(255, 255, 255, .5)}
+    </style>
+  </head>
+  <body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+      <header class="masthead mb-auto">
+        <div class="inner">
+          <h3 class="masthead-brand"><a href="/">TempHosting</a></h3>
+          <nav class="nav nav-masthead justify-content-center">
+            <a class="nav-link" href="https://github.com/eslam-mahmoud/temphosting" target="_blank">View on Github</a>
+            <a class="nav-link" href="/terms-of-use">terms of use</a>
+            <!-- <a class="nav-link" href="#">Contact</a> -->
+          </nav>
+        </div>
+      </header>
+
+      <main role="main" class="inner cover">
+        <h1 class="cover-heading">Temp Hosting</h1>
+        <p class="lead">Upload your files, Set expiration date.</p>
+        <div class="alert alert-primary" id="output" role="alert" style="display: none;"></div>
+        <form action="/upload" method="POST" id="upload" enctype="multipart/form-data">
+          <div class="row p-3">
+            <div class="col-md-12 mb-12">
+              <select class="custom-select d-block w-100" id="expiration" name="expiration" required="">
+                <option value="10m">10 Minutes</option>
+                <option value="1h">1 hour</option>
+                <option value="24h">1 Day</option>
+              </select>
+            </div>
+          </div>
+          <div class="row p-3">
+            <div class="col-md-12 mb-12">
+              <input type="file" class="form-control" id="file" name="file" placeholder="" required="">
+              <div class="invalid-feedback">
+                File is required.
+              </div>
+            </div>
+          </div>
+          <div class="row p-3">
+            <div class="col-md-12 mb-12">
+              <p class="lead">
+                <button type="submit" id="submit" class="btn btn-lg btn-secondary">Upload</button>
+              </p>
+            </div>
+          </div>
+        </form>
+      </main>
+
+      <footer class="mastfoot mt-auto">
+        <div class="inner">
+          <p>by <a href="https://twitter.com/eslam_mahmoud" target="_blank">@eslam_mahmoud</a>.</p>
+        </div>
+      </footer>
+  </div>
+  
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script>
+    $(document).ready(function(){
+        $("#upload").submit(function (event) {
+            //stop submit the form, we will post it manually.
+            event.preventDefault();
+            // Hide output text
+            $("#output").hide();
+            // Get form
+            var form = $('#upload')[0];
+            // Create an FormData object 
+            var data = new FormData(form);
+            // disabled the submit button
+            $("#submit").prop("disabled", true);
+
+            $("#output").text("Uploading...");
+            $("#output").show();
+            $.ajax({
+                type: "POST",
+                enctype: 'multipart/form-data',
+                url: "/upload",
+                data: data,
+                processData: false,
+                contentType: false,
+                cache: false,
+                success: function (data) {
+                    $("#output").text(window.location.origin + "/i/" + data.id);
+                    $("#submit").prop("disabled", false);
+                    $("#file").val("");
+                },
+                error: function (e) {
+                    $("#output").text(e.responseText);
+                    $("#submit").prop("disabled", false);
+                }
+            });
+        });
+    })
+  </script>
+</body>
+</html>
